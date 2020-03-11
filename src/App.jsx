@@ -1,12 +1,14 @@
 import React, { Component, createRef } from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch, withRouter } from 'react-router-dom';
 import './App.css';
 
-import { NavActors, NavMovies } from './components/nav';
+import Nav from './components/nav';
+import MovieInfo2 from './components/movieInfo2';
+// import MovieInfo2 from './components/movieInfo';
 import MoviesContainer from './components/moviesContainer';
 import ActorsContainer from './components/actorsContainer';
 
-export default class App extends Component {
+class App extends Component {
 
   constructor() {
     super();
@@ -15,20 +17,28 @@ export default class App extends Component {
 
   state = {
     search: '',
+    individual: false,
   }
 
   render() {
+
+
     return (
       <Router>
         <Switch>
 
+          <Route path="/movie/:id">
+            <MovieInfo2 />
+            {/* <Nav onSearch={this.handleMovieSearch} type='movies'></Nav> */}
+          </Route>
+
           <Route path="/movies">
-            <NavMovies onSearch={this.handleMovieSearch} type='movies'></NavMovies>
-            <MoviesContainer ref={this.searchResultsRef} search={this.state.search} />
+            <Nav onSearch={this.handleMovieSearch} type='movies'></Nav>
+            <MoviesContainer onMovieSeeMore={this.getIndividualMovieInfo} ref={this.searchResultsRef} search={this.state.search} />
           </Route>
 
           <Route path="/actors">
-            <NavActors onSearch={this.handleActorSearch} type='actors'></NavActors>
+            <Nav onSearch={this.handleActorSearch} type='actors'></Nav>
             <ActorsContainer />
           </Route>
 
@@ -46,7 +56,44 @@ export default class App extends Component {
     event.preventDefault();
     console.log('This has not been implemented');
   }
+
+
+  // attemptMovieInfo = async (movieId) => {
+  //   try {
+  //     const url = `http://localhost:3001/findMovie?query=${movieId}`;
+  //     const response = await fetch(url);
+  //     const individual = await response.json();
+  //     // debugger;
+  //     this.setState({ individual });
+
+  //     // this.props.history.push('/aaaaa/');
+
+  //     // navigate
+  //   } catch (e) {
+  //     // redirect back to movies list
+  //     console.error(e);
+  //   }
+  // }
+
+
+  // getIndividualMovieInfo = async (movieId) => {
+  //   try {
+  //     const url = `http://localhost:3001/findMovie?query=${movieId}`;
+  //     const response = await fetch(url);
+  //     const individual = await response.json();
+  //     // debugger;
+  //     this.setState({ individual });
+
+  //     this.props.history.push('/aaaaa/');
+
+  //     // navigate
+  //   } catch (e) {
+  //     // redirect back to movies list
+  //     console.error(e);
+  //   }
+  // }
 }
+export default App;
 
 /**
  * TODO:

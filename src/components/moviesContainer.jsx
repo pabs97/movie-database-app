@@ -29,7 +29,8 @@ class MoviesContainer extends Component {
       <MoviesResults
         title={title}
         movies={movies}
-        onMovieSeeMore={this.getIndividualMovieInfo}
+        // onMovieSeeMore={this.getIndividualMovieInfo}
+        onMovieSeeMore={this.props.onMovieSeeMore}
       />
     );
   }
@@ -47,16 +48,17 @@ class MoviesContainer extends Component {
     this.setState({ individual: false });
   }
 
-  getIndividualMovieInfo = async (movieId) => {
-    try {
-      const url = `http://localhost:3001/findMovie?query=${movieId}`;
-      const response = await fetch(url);
-      const individual = await response.json();
-      this.setState({ individual });
-    } catch (e) {
-      console.error(e);
-    }
-  }
+  // getIndividualMovieInfo = async (movieId) => {
+  //   try {
+  //     const url = `http://localhost:3001/findMovie?query=${movieId}`;
+  //     const response = await fetch(url);
+  //     const individual = await response.json();
+  //     // debugger;
+  //     this.setState({ individual });
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // }
 
   async updateMovieResults(search) {
     try {

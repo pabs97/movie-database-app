@@ -1,49 +1,68 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
-class Nav extends Component {
 
+export default class Nav extends Component {
   state = {
     value: ''
   }
 
   render() {
-    const { search, bgcolor } = this.getTypeProps();
+    const { type } = this.props;
+    let bgcolor, placeholder;
+
+    if (type === 'actors') {
+      bgcolor = 'bg-dark';
+      placeholder = 'Search Actors';
+    } else {
+      bgcolor = 'bg-primary';
+      placeholder = 'Search Movies';
+    }
 
     return (
-      <nav className={'navbar navbar-dark ' + bgcolor} >
+      // <nav className={'navbar navbar-dark bg-dark'} >
+      <nav className={'navbar navbar-dark navbar-expand-md ' + bgcolor} >
+        <div className="navbar-collapse collapse">
+          < span className="font-weight-bold navbar-text">Super Movie DB</span>
+          <ul className="navbar-nav mr-auto">
+            <li className="nav-item">
+              <Link to='/movies' className="nav-link">Movies</Link>
+            </li>
+            <li className="nav-item">
+              <Link to='/actors' className="nav-link">Actors</Link>
+            </li>
+          </ul></div>
 
-        <span className="font-weight-bold navbar-text">Super Movie DB</span>
-        <Link to='/movies' className="navbar-text">Movies</Link>
-        <Link to='/actors' className="navbar-text">Actors</Link>
+
+
+        {/* < span className="font-weight-bold navbar-text">Super Movie DB</span>
+      <Link to='/movies' className="navbar-text">Movies</Link>
+      <Link to='/actors' className="navbar-text">Actors</Link> */}
 
         <form className="form-inline" onSubmit={(event) => this.props.onSearch(event, this.state.value)}>
-          <input className="form-control mr-sm-2" type="search" placeholder={search} aria-label="Search" onChange={this.handleChange} />
+          <input className="form-control mr-sm-2" type="search" placeholder={placeholder} aria-label={placeholder} onChange={this.handleChange} />
           <button className="btn btn-outline-success my-2 my-sm-0">Search</button>
         </form>
-      </nav>
+      </nav >
     )
   }
-
   handleChange = (event) => {
     this.setState({ value: event.target.value });
+
+    debounce(() => console.log('typing'));
   }
+
 }
 
-export class NavActors extends Nav {
-  getTypeProps() {
-    return {
-      search: 'Search Actors',
-      bgcolor: 'bg-dark',
-    }
-  }
-}
+const delay = 500;
+let timeout = null;
 
-export class NavMovies extends Nav {
-  getTypeProps() {
-    return {
-      search: 'Search Movies',
-      bgcolor: 'bg-primary',
-    }
-  }
+function debounce(fn) {
+  if (timeout) clearTimeout(timeout);
+
+  timeout = setTimeout(() => {
+    fn();
+    timeout = null;
+  }, delay);
+
 }
