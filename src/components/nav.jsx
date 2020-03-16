@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { updateMovieResults } from '../util/movieDbApi';
 
 
 export default class Nav extends Component {
   state = {
-    value: ''
+    value: '',
+    results: []
   }
 
   render() {
@@ -40,21 +42,62 @@ export default class Nav extends Component {
       <Link to='/actors' className="navbar-text">Actors</Link> */}
 
         <form className="form-inline" onSubmit={(event) => this.props.onSearch(event, this.state.value)}>
-          <input className="form-control mr-sm-2" type="search" placeholder={placeholder} aria-label={placeholder} onChange={this.handleChange} />
+          <input className="form-control mr-sm-2" type="search" placeholder={placeholder} aria-label={placeholder} onChange={this.handleTyping} />
+          {this.renderInputSearchResults()}
           <button className="btn btn-outline-success my-2 my-sm-0">Search</button>
         </form>
       </nav >
     )
   }
-  handleChange = (event) => {
-    this.setState({ value: event.target.value });
 
-    debounce(() => console.log('typing'));
+  renderInputSearchResults() {
+    const { results } = this.state;
+
+    if (results.length) {
+      return (
+        <section
+          className="inputSearchResults"
+        >
+
+          {results.map((result, i) => {
+            return <p key={i}>{result}</p>
+          })}
+        </section>
+      );
+
+
+    }
+  }
+
+  handleTyping = (event) => {
+
+
+    const { value } = event.target;
+    if (!value) {
+      this.setState({ value, results: [] });
+      return;
+    }
+
+    this.setState({ value });
+
+    return;
+
+    debounce(async () => {
+      const results = await updateMovieResults(value);
+
+      this.setState({
+        results: results
+          .splice(0, 5)
+          .map(r => r.title)
+      });
+    });
+
   }
 
 }
 
-const delay = 500;
+
+const delay = 1000;
 let timeout = null;
 
 function debounce(fn) {
@@ -64,5 +107,4 @@ function debounce(fn) {
     fn();
     timeout = null;
   }, delay);
-
 }

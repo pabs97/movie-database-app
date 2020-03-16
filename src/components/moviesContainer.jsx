@@ -1,7 +1,8 @@
 import React, { Component, Fragment } from 'react';
 import MovieInfo from './movieInfo';
 import MoviesResults from './moviesResults';
-import { apikey } from '../util/keys.json';
+
+import { getPopularMovies, updateMovieResults } from '../util/movieDbApi';
 
 class MoviesContainer extends Component {
 
@@ -14,75 +15,40 @@ class MoviesContainer extends Component {
   render() {
     const { movies, individual, title } = this.state;
 
-    if (individual) {
-      return (
-        <Fragment>
-          <button className="btn btn-primary" onClick={this.handleBackClick}>Back to Results</button>
-          <MovieInfo
-            {...individual}
-          />
-        </Fragment>
-      );
-    }
+    // TODO: add this to movieInfo2
+    // if (individual) {
+    //   return (
+    //     <Fragment>
+    //       <button className="btn btn-primary" onClick={this.handleBackClick}>Back to Results</button>
+    //       <MovieInfo
+    //         {...individual}
+    //       />
+    //     </Fragment>
+    //   );
+    // }
 
     return (
       <MoviesResults
         title={title}
         movies={movies}
-        // onMovieSeeMore={this.getIndividualMovieInfo}
         onMovieSeeMore={this.props.onMovieSeeMore}
       />
     );
   }
 
   async componentDidMount() {
-    try {
-      const url = 'http://localhost:3001/popularMovies';
-      await this.getMovieResults(url);
-    } catch (e) {
-      console.error(e);
-    }
+    const movies = await getPopularMovies();
+    this.setState({ movies });
   }
 
-  handleBackClick = () => {
-    this.setState({ individual: false });
+  async updateResults(search) {
+    const movies = await updateMovieResults(search);
+    this.setState({ movies });
   }
 
-  // getIndividualMovieInfo = async (movieId) => {
-  //   try {
-  //     const url = `http://localhost:3001/findMovie?query=${movieId}`;
-  //     const response = await fetch(url);
-  //     const individual = await response.json();
-  //     // debugger;
-  //     this.setState({ individual });
-  //   } catch (e) {
-  //     console.error(e);
-  //   }
+  // handleBackClick = () => {
+  //   this.setState({ individual: false });
   // }
-
-  async updateMovieResults(search) {
-    try {
-      this.setState({
-        individual: '',
-        title: `Search Results for "${search}"`
-      });
-      const url = `http://localhost:3001/searchMovies?query=${search}`;
-      await this.getMovieResults(url);
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  async getMovieResults(url) {
-    try {
-      const response = await fetch(url);
-      const movies = await response.json();
-      this.setState({ movies });
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
 }
 
 export default MoviesContainer;

@@ -1,10 +1,9 @@
 import React, { Component, createRef } from 'react';
 import { BrowserRouter as Router, Route, Switch, withRouter } from 'react-router-dom';
-import './App.css';
+import './index.css';
 
 import Nav from './components/nav';
-import MovieInfo2 from './components/movieInfo2';
-// import MovieInfo2 from './components/movieInfo';
+import MovieInfo from './components/movieInfo';
 import MoviesContainer from './components/moviesContainer';
 import ActorsContainer from './components/actorsContainer';
 
@@ -28,8 +27,8 @@ class App extends Component {
         <Switch>
 
           <Route path="/movie/:id">
+            <Nav onSearch={this.handleMovieSearch} type='movies'></Nav>
             <MovieInfo2 />
-            {/* <Nav onSearch={this.handleMovieSearch} type='movies'></Nav> */}
           </Route>
 
           <Route path="/movies">
@@ -49,51 +48,18 @@ class App extends Component {
 
   handleMovieSearch = (event, search) => {
     event.preventDefault();
-    this.searchResultsRef.current.updateMovieResults(search);
+    this.searchResultsRef.current.updateResults(search);
   }
 
   handleActorSearch = (event, search) => {
     event.preventDefault();
     console.log('This has not been implemented');
   }
-
-
-  // attemptMovieInfo = async (movieId) => {
-  //   try {
-  //     const url = `http://localhost:3001/findMovie?query=${movieId}`;
-  //     const response = await fetch(url);
-  //     const individual = await response.json();
-  //     // debugger;
-  //     this.setState({ individual });
-
-  //     // this.props.history.push('/aaaaa/');
-
-  //     // navigate
-  //   } catch (e) {
-  //     // redirect back to movies list
-  //     console.error(e);
-  //   }
-  // }
-
-
-  // getIndividualMovieInfo = async (movieId) => {
-  //   try {
-  //     const url = `http://localhost:3001/findMovie?query=${movieId}`;
-  //     const response = await fetch(url);
-  //     const individual = await response.json();
-  //     // debugger;
-  //     this.setState({ individual });
-
-  //     this.props.history.push('/aaaaa/');
-
-  //     // navigate
-  //   } catch (e) {
-  //     // redirect back to movies list
-  //     console.error(e);
-  //   }
-  // }
 }
+
 export default App;
+
+
 
 /**
  * TODO:
