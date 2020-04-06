@@ -1,54 +1,41 @@
 import React, { Component, Fragment } from 'react';
-import MovieInfo from './movieInfo';
-import MoviesResults from './moviesResults';
-
-import { getPopularMovies, updateMovieResults } from '../util/movieDbApi';
+import MovieTile from './movieTile';
+import { getPopularMoviesAction, searchMoviesAction } from '../actions/fetchMovieActions';
+import { connect } from 'react-redux';
 
 class MoviesContainer extends Component {
 
-  state = {
-    movies: [],
-    individual: false,
-    title: 'Popular Movies',
-  }
-
   render() {
-    const { movies, individual, title } = this.state;
-
-    // TODO: add this to movieInfo2
-    // if (individual) {
-    //   return (
-    //     <Fragment>
-    //       <button className="btn btn-primary" onClick={this.handleBackClick}>Back to Results</button>
-    //       <MovieInfo
-    //         {...individual}
-    //       />
-    //     </Fragment>
-    //   );
-    // }
-
+    const { title, movies } = this.props;
     return (
-      <MoviesResults
-        title={title}
-        movies={movies}
-        onMovieSeeMore={this.props.onMovieSeeMore}
-      />
+      <Fragment>
+        <h3>{title}</h3>
+        <section className="d-flex flex-wrap">
+          {populateMovieTitles()}
+        </section>
+      </Fragment>
     );
+
+    function populateMovieTitles() {
+      return movies.map(movie => {
+        return (
+          <MovieTile
+            key={movie.id}
+            {...movie}
+          />
+        )
+      });
+    }
   }
 
-  async componentDidMount() {
-    const movies = await getPopularMovies();
-    this.setState({ movies });
+  componentDidMount() {
+    if (!this.props.movies.length) this.props.getPopularMoviesAction();
   }
 
-  async updateResults(search) {
-    const movies = await updateMovieResults(search);
-    this.setState({ movies });
-  }
-
-  // handleBackClick = () => {
-  //   this.setState({ individual: false });
-  // }
 }
 
-export default MoviesContainer;
+const mapStateToProps = (state) => {
+  return { ...state.moviesContainerReducer };
+}
+
+export default connect(mapStateToProps, { getPopularMoviesAction, searchMoviesAction })(MoviesContainer);

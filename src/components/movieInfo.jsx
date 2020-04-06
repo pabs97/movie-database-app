@@ -1,21 +1,17 @@
 import React, { Component } from 'react';
 import { withLastLocation } from 'react-router-last-location';
+import { getMovieAction } from '../actions/fetchMovieActions';
+import { connect } from 'react-redux';
 
 class MovieInfo extends Component {
 
-  state = {
-    data: {},
-  }
-
   render() {
+    const { title, tagline, release_date, overview, video } = this.props;
 
-    const { title, tagline, release_date, overview, video } = this.state.data;
-
-    // TODO: implement back button
     return (
       <section>
+        {this.showBackButton()}
 
-        {/* <button className="btn btn-primary" onClick={this.handleBackClick}>Back to Results</button> */}
         <h3>{title}</h3>
         {videoIframe()}
         <p>{tagline}</p>
@@ -27,27 +23,21 @@ class MovieInfo extends Component {
     function videoIframe() {
       if (video && video.key) {
         return (
-          <iframe width="560" height="315" src={`https://www.youtube.com/embed/${video.key}`} frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          <iframe width="560" height="315" src={`https://www.youtube.com/embed/${video.key}`} frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
         );
       }
     }
   }
 
-  componentDidMount = async () => {
-    const { id } = this.props.match.params;
-    console.log('match', id);
-
-    try {
-      // TODO: put this in util
-      const url = `http://localhost:3001/findMovie?query=${id}`;
-      const response = await fetch(url);
-      const data = await response.json();
-      this.setState({ data });
-    } catch (e) {
-      console.error(e);
-    }
+  componentDidMount = () => {
+    this.props.getMovieAction(this.props.match.params.id);
   }
 
+  showBackButton = () => {
+    if (this.props.backButton) {
+      return <button className="btn btn-primary" onClick={this.props.history.goBack}>Back to Results</button>;
+    }
+  }
 }
 
 function formatDate(date) {
@@ -58,4 +48,8 @@ function formatDate(date) {
   return dateTimeFormat.format(new Date(date));
 }
 
-export default withLastLocation(MovieInfo);
+const mapStateToProps = (state) => {
+  return { ...state.movieInfoReducer };
+}
+
+export default connect(mapStateToProps, { getMovieAction })(withLastLocation(MovieInfo));

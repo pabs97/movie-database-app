@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { updateMovieResults } from '../util/movieDbApi';
+import { withLastLocation } from 'react-router-last-location';
+import { handleSearchTypingAction } from '../actions/navActions';
+import { searchMoviesAction } from '../actions/fetchMovieActions';
+import { connect } from 'react-redux';
 
-
-export default class Nav extends Component {
-  state = {
-    value: '',
-    results: []
-  }
+class Nav extends Component {
 
   render() {
     const { type } = this.props;
@@ -22,7 +20,6 @@ export default class Nav extends Component {
     }
 
     return (
-      // <nav className={'navbar navbar-dark bg-dark'} >
       <nav className={'navbar navbar-dark navbar-expand-md ' + bgcolor} >
         <div className="navbar-collapse collapse">
           < span className="font-weight-bold navbar-text">Super Movie DB</span>
@@ -35,21 +32,24 @@ export default class Nav extends Component {
             </li>
           </ul></div>
 
-
-
-        {/* < span className="font-weight-bold navbar-text">Super Movie DB</span>
-      <Link to='/movies' className="navbar-text">Movies</Link>
-      <Link to='/actors' className="navbar-text">Actors</Link> */}
-
-        <form className="form-inline" onSubmit={(event) => this.props.onSearch(event, this.state.value)}>
-          <input className="form-control mr-sm-2" type="search" placeholder={placeholder} aria-label={placeholder} onChange={this.handleTyping} />
-          {this.renderInputSearchResults()}
+        <form
+          className="form-inline"
+          onSubmit={this.handleSearchSubmit}
+        >
+          <input className="form-control mr-sm-2" type="search" placeholder={placeholder} aria-label={placeholder} onChange={this.props.handleSearchTypingAction} />
+          {/* {this.renderInputSearchResults()} */}
           <button className="btn btn-outline-success my-2 my-sm-0">Search</button>
         </form>
       </nav >
     )
   }
 
+  handleSearchSubmit = (event) => {
+    this.props.searchMoviesAction(event, this.props.searchValue)
+      .then(() => this.props.history.push('/movies/'));
+  }
+
+  // TODO: implement this
   renderInputSearchResults() {
     const { results } = this.state;
 
@@ -69,42 +69,45 @@ export default class Nav extends Component {
     }
   }
 
-  handleTyping = (event) => {
+  // handleTyping = (event) => {
+  //   const { value } = event.target;
+  //   if (!value) {
+  //     this.setState({ value, results: [] });
+  //     return;
+  //   }
+  //   this.setState({ value });
+  //   return;
 
+  //   debounce(async () => {
+  //     const results = await updateMovieResults(value);
 
-    const { value } = event.target;
-    if (!value) {
-      this.setState({ value, results: [] });
-      return;
-    }
-
-    this.setState({ value });
-
-    return;
-
-    debounce(async () => {
-      const results = await updateMovieResults(value);
-
-      this.setState({
-        results: results
-          .splice(0, 5)
-          .map(r => r.title)
-      });
-    });
-
-  }
-
+  //     this.setState({
+  //       results: results
+  //         .splice(0, 5)
+  //         .map(r => r.title)
+  //     });
+  //   });
+  // }
 }
 
+// const delay = 1000;
+// let timeout = null;
 
-const delay = 1000;
-let timeout = null;
+// function debounce(fn) {
+//   if (timeout) clearTimeout(timeout);
 
-function debounce(fn) {
-  if (timeout) clearTimeout(timeout);
+//   timeout = setTimeout(() => {
+//     fn();
+//     timeout = null;
+//   }, delay);
+// }
 
-  timeout = setTimeout(() => {
-    fn();
-    timeout = null;
-  }, delay);
-}
+const mapStateToProps = (state) => {
+  return { ...state.searchInputReducer };
+
+};
+
+export default connect(mapStateToProps, {
+  searchMoviesAction,
+  handleSearchTypingAction
+})(withLastLocation(Nav));
